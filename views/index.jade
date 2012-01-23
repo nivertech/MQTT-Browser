@@ -1,0 +1,15 @@
+.page-header
+    h1 MQTT Topic Browser 
+        small A live view of the messages flowing through your MQTT Broker
+
+.row
+    .span16.columns
+        p Please enter your broker ip address
+
+        form(method='post', action='/broker')
+            .clearfix
+                label(for='address') IP Address
+                .input
+                    input(name='address', placeholder='Enter IP Address', type='text')
+                .actions
+                    input(name='submit',type='submit', title='Login to broker', class='btn primary')
