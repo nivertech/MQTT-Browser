@@ -11,6 +11,7 @@ var app 			= express.createServer();
 var controller                  = require("./util/controller");
 var io                          = require('socket.io').listen(app);
 var spawn                       = require('child_process').spawn;
+var client                      = '';
 
 app.configure(function(){
     app.use(express.logger({
@@ -39,7 +40,7 @@ app.get('/', function(req, res){
 app.post('/broker', function(req, res){
     
     var ip = req.param('address', null);
-    var topic = "#";
+    var topic = "$SYS/#";
     
     
         
@@ -59,7 +60,9 @@ app.post('/broker', function(req, res){
         client = mqtt.createClient(1883, ip)
            
         client.connect({
-            keepalive: 3000
+            keepalive: 3000,
+            client : 'MQTT Browser',
+            clean : 1
         });
 
         client.on('connack', function(packet) {
@@ -86,24 +89,25 @@ app.post('/broker', function(req, res){
                 message : String(packet.payload)
             });
                 
-            //console.log('%s\t%s', packet.topic, packet.payload);
+        //console.log('%s\t%s', packet.topic, packet.payload);
         });
 
         client.on('close', function() {
             //client = null;
-        });
+            });
 
         client.on('error', function(e) {
             console.log('error %s', e);
-            //process.exit(-1);
+        //process.exit(-1);
+        });
+        
+        socket.on('disconnect', function(){
+            client.disconnect();
+            console.log('disconnected');
         });
     });
     
-    io.sockets.on('disconnect', function(){
-        client.disconnect();
-        ip = null;
-        console.log('disconnected');
-    });
+    
 });
 
 app.get('/topic', function(req, res){
